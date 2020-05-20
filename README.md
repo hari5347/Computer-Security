@@ -1,2 +1,2 @@
 # Computer-Security
-Computer security lab assignments 
+Computer security assignments
