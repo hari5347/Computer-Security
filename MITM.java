@@ -22,16 +22,30 @@ public class MITM {
 		
 		//we use the partial bits we know from the key to define a binary key
 		long longFormatKey1 = Long.parseLong(partOfKey1, 16); 
-		String tentativeBinKey1 = String.format("%40s", Long.toBinaryString(longFormatKey1)).replace(' ', '0');
+		String tentativeBinKey1 = String.format("%s", Long.toBinaryString(longFormatKey1)).replace(' ', '0');
 		
+		while (tentativeBinKey1.length() < partOfKey1.length()*4){
+			tentativeBinKey1 = "0" + tentativeBinKey1;
+		}
+
+
 		// This hashtable will record all (cyphertext, key) pairs
 		Dictionary<String, String> hashTable = new Hashtable();
 		
 		/*
 		 * this for loop will try all possible values for key 1 and populate the hash table
 		 */
-		for (int y = 0; y < 65536; y++) { // 65536 = 2^16
-			String binaryIntermediate = String.format("%16s", Integer.toBinaryString(y)).replace(' ', '0');
+
+		int iterlen = 56 - tentativeBinKey1.length();
+		int iterexp = 1 << iterlen;
+
+		for (int y = 0; y < iterexp; y++) {
+			String binaryIntermediate = String.format("%s", Integer.toBinaryString(y)).replace(' ', '0');
+
+			while (binaryIntermediate.length() < iterlen){
+				binaryIntermediate = "0" + binaryIntermediate;
+			}
+
 			String possibleKey = binaryIntermediate + tentativeBinKey1;
 			
 			// store corresponding hex for output
@@ -88,24 +102,38 @@ public class MITM {
 		 * into the cyphertext.
 		 */
 
+		//Input Format java MITM <plaintext> <ciphertext> <key1> <key2>
+
 		// cypher text part of the plaintext, cyphertext pair
-		byte[] cypherText = DatatypeConverter.parseHexBinary("e89d327477bd5da2f84bcc6d016617d2");
+		byte[] cypherText = DatatypeConverter.parseHexBinary(args[1]);
 		// part of the first key that was given in the lab question
-		String partOfKey1 = "1111111111";		
+		//String partOfKey1 = "1111111111";	
+		String partOfKey1 = args[2];
+		String partOfKey2 = args[3];	
 		// call method createKeyHashtable to create a dictionnary of keys and corresponding cypher text for cypher 1
-		Dictionary<String, String> hashTable = createKeyHashtable("48656c6c6f20576f726c6421", partOfKey1);
+		Dictionary<String, String> hashTable = createKeyHashtable(args[0], partOfKey1);
 
 		// try all possible keys for key 2 until I find one that produces a plain text that matches
 		// something from the dictionnary, in which case return the corresponding key value
-		long longFormatKey2 = Long.parseLong("22222222", 16);
-		String tentativeBinKey2 = String.format("%32s", Long.toBinaryString(longFormatKey2)).replace(' ', '0');
-
+		//long longFormatKey2 = Long.parseLong("22222222", 16);
+		long longFormatKey2 = Long.parseLong(partOfKey2, 16);
+		String tentativeBinKey2 = String.format("%s", Long.toBinaryString(longFormatKey2)).replace(' ', '0');
+		while (tentativeBinKey2.length() < partOfKey2.length()*4){
+			tentativeBinKey2 = "0" + tentativeBinKey2;
+		}
 		
+		int iterlen = 56 - tentativeBinKey2.length();
+		int iterexp = 1 << iterlen;
 		/*
 		 * this for loop will try all possible values for key 2
 		 */
-		for (int y = 0; y < 16777216; y++) {
-			String binaryIntermediate = String.format("%24s", Integer.toBinaryString(y)).replace(' ', '0');
+		for (int y = 0; y < iterexp; y++) {
+			String binaryIntermediate = String.format("%s", Integer.toBinaryString(y)).replace(' ', '0');
+			
+			while (binaryIntermediate.length() < iterlen){
+				binaryIntermediate = "0" + binaryIntermediate;
+			}
+
 			String possibleKey = binaryIntermediate + tentativeBinKey2;
 			
 			// store corresponding hex for output
@@ -158,3 +186,20 @@ public class MITM {
 		}
 	}
 }
+
+/*
+Case 1: 
+	Plaintext = 0123456789abcdef
+	Ciphertext = 3057b90bd52bae5e1dc92a4ef6dd9775
+	Key1 = 00000000000000
+	Key2 = 11111111111111
+Case 2:
+	Plaintext = 48656c6c6f20576f726c6421
+	Ciphertext = e89d327477bd5da2f84bcc6d016617d2
+	Key1 = 1ab51111111111
+	Key2 = 89fe3322222222
+2^16 = 65536
+2^20 = 1048576
+2^24 = 16777216
+2^28 = 268435456
+*/
