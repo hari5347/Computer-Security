@@ -75,10 +75,6 @@ public class MITM {
 			}
 			byte[] keyBytes = DatatypeConverter.parseHexBinary(currentParityKey);
 			
-			if (keyBytes.length > 8) {
-				keyBytes = Arrays.copyOfRange(keyBytes, 1, keyBytes.length);
-			} 	
-			
 			// Create secret key in JCE format
 			Cipher myDesCipher1 = Cipher.getInstance("DES/ECB/PKCS5Padding"); //to allow for any input size, use padding
 			DESKeySpec saltForKeyFactory = new DESKeySpec(keyBytes);
@@ -161,11 +157,7 @@ public class MITM {
 			while (currentParityKey.length() < 16)
 				currentParityKey = "0" + currentParityKey;
 			byte[] keyBytes = DatatypeConverter.parseHexBinary(currentParityKey);
-			
-			if (keyBytes.length > 8) {
-				keyBytes = Arrays.copyOfRange(keyBytes, 1, keyBytes.length);
-			}
-			
+				
 			
 			 // Create secret key in JCE format
 			Cipher myDesCipher2 = Cipher.getInstance("DES/ECB/NoPadding");
